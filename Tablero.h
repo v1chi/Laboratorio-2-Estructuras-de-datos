@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+
 class Tablero {
 
 private:
@@ -24,6 +26,11 @@ public:
         columnasDisponibles = std::vector<int>(columnas, filas - 1);
     }
 
+    //Constructor en base a archivo
+    Tablero(const std::string& archivo){
+         cargarPartida(archivo);
+    }
+
     //Destructor
     ~Tablero() {
         // Liberar memoria del tablero
@@ -33,10 +40,48 @@ public:
         delete[] tablero;
     }
 
+    //Guardar partida en archivo
+    void guardarPartida(const std::string& archivo) const {
+        ofstream salida(archivo);
+
+        if (!salida) {
+            cout << "Error al abrir el archivo para guardar la partida." << endl;
+            return;
+        }
+
+        // Guardar el estado actual del tablero en el archivo
+        for (int i = 0; i < filas; ++i) {
+            for (int j = 0; j < columnas; ++j) {
+                salida << tablero[i][j] << " ";
+            }
+            salida << "\n";
+        }
+
+        salida.close();
+    }
+
+    //Cargar partida en base a un archivo
+    void cargarPartida(const std::string& archivo) {
+        ifstream entrada(archivo);
+
+        if (!entrada) {
+            cout << "Error al abrir el archivo para cargar la partida. Se creará un tablero nuevo." << endl;
+            return;
+        }
+
+        // Cargar el estado del tablero desde el archivo
+        for (int i = 0; i < filas; ++i) {
+            for (int j = 0; j < columnas; ++j) {
+                entrada >> tablero[i][j];
+            }
+        }
+
+        entrada.close();
+    }
+
     int getColumnas(){
         return columnas;
     }
-
 
     //Imprimir estado del tablero
     void imprimirTablero() const {
@@ -85,50 +130,12 @@ public:
         return true;
     }
 
-    void GuardarPartida(char tablero[6][7], const string &nombreArchivo) {
-        ofstream archivo(nombreArchivo);
-        if (archivo.is_open()) {
-            for (int i = 0; i < 6; ++i) {
-                for (int j = 0; j < 7; ++j) {
-                    archivo << tablero[i][j] << ",";
-                }
-                archivo << "\n";
-            }
-            archivo.close();
-            cout << "Partida guardada correctamente.\n";
-        } else {
-            cerr << "Error al guardar la partida.\n";
-        }
-    }
-
-    void CargarPartida(char tablero[6][7], const string &nombreArchivo) {
-        ifstream archivo(nombreArchivo);
-        if (archivo.is_open()) {
-            for (int i = 0; i < 6; ++i) {
-                string fila;
-                if (getline(archivo, fila)) {
-                    istringstream iss(fila);
-                    char c;
-                    for (int j = 0; j < 7; ++j) {
-                        if (iss >> c) {
-                            tablero[i][j] = c;
-                            iss.ignore(); // Ignorar la coma
-                        }
-                    }
-                }
-            }
-            archivo.close();
-            cout << "Partida cargada correctamente.\n";
-        } else {
-            cerr << "Error al cargar la partida.\n";
-        }
-    }
-
     //Verificar si la columna está llena
     bool columnaLlena(int columna) const {
         return columnasDisponibles[columna - 1] < 0;
     }
 
+    //Verificar si el tablero está lleno
     bool tableroLLeno() const {
         // Verificar si el tablero está lleno (empate)
         for (int i = 0; i < columnas; ++i) {
@@ -141,7 +148,6 @@ public:
     };
 
     //Ver quien ganó
-
     char verificarGanador() const {
         // Verificar líneas horizontales
         for (int i = 0; i < filas; ++i) {
@@ -190,9 +196,9 @@ public:
 
     int evaluarTablero(const Tablero& tablero) {
         // Evaluar el estado del tablero desde el punto de vista de 'X' y 'O'
-        if (tablero.verificarGanador('X')) {
+        if (tablero.verificarGanador() == 'X') {
             return 1;  // Gana 'X'
-        } else if (tablero.verificarGanador('O')) {
+        } else if (tablero.verificarGanador() == 'O') {
             return -1;  // Gana 'O'
         } else if (tablero.tableroLLeno()) {
             return 0;  // Empate
@@ -200,7 +206,5 @@ public:
             return 9999;  // El juego no ha terminado
         }
     }
-
-
     
 };
