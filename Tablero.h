@@ -41,7 +41,7 @@ public:
     }
 
     //Guardar partida en archivo
-    void guardarPartida(const std::string& archivo) const {
+    void guardarPartida(const string& archivo) const {
         ofstream salida(archivo);
 
         if (!salida) {
@@ -58,10 +58,11 @@ public:
         }
 
         salida.close();
+        
     }
 
     //Cargar partida en base a un archivo
-    void cargarPartida(const std::string& archivo) {
+    void cargarPartida(const string& archivo) {
         ifstream entrada(archivo);
 
         if (!entrada) {
@@ -76,12 +77,14 @@ public:
             }
         }
 
-        entrada.close();
+        // Luego de cargar el tablero, verificar el estado
+        char ganador = verificarGanador();
+        if (ganador != ' ') {
+            cout << "La partida cargada ya tiene un ganador: " << ganador << endl;
     }
 
-    int getColumnas(){
-        return columnas;
-    }
+    entrada.close();
+}
 
     //Imprimir estado del tablero
     void imprimirTablero() const {
@@ -114,6 +117,14 @@ public:
         profundidadMaxima = 7; // Profundidad alta para nivel difícil
     }
 
+    int getProfundidad(){
+        return profundidadMaxima;
+    }
+
+    vector<int> columnasDisponibles getColumnasDisponibles(){
+        return vector<int> columnasDisponibles;
+    }
+    
     //Movimiento del jugador
     bool hacerMovimiento(int columna, char jugador) {
         // Verificar si la columna está llena
