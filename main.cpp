@@ -1,116 +1,65 @@
-
 #include <bits/stdc++.h>
 #include <fstream>
 #include <sstream>
+#include "Conect4.h"
+#include "ultimoJuego.csv"
 using namespace std;
 
-
-void GuardarPartida(char tablero[6][7], const string &nombreArchivo) {
-    ofstream archivo(nombreArchivo);
-    if (archivo.is_open()) {
-        for (int i = 0; i < 6; ++i) {
-            for (int j = 0; j < 7; ++j) {
-                archivo << tablero[i][j] << ",";
-            }
-            archivo << "\n";
-        }
-        archivo.close();
-        cout << "Partida guardada correctamente.\n";
-    } else {
-        cerr << "Error al abrir el archivo para guardar la partida.\n";
-    }
-}
-
-void CargarPartida(char tablero[6][7], const string &nombreArchivo) {
-    ifstream archivo(nombreArchivo);
-    if (archivo.is_open()) {
-        for (int i = 0; i < 6; ++i) {
-            string fila;
-            if (getline(archivo, fila)) {
-                istringstream iss(fila);
-                char c;
-                for (int j = 0; j < 7; ++j) {
-                    if (iss >> c) {
-                        tablero[i][j] = c;
-                        iss.ignore(); // Ignorar la coma
-                    }
-                }
-            }
-        }
-        archivo.close();
-        cout << "Partida cargada correctamente.\n";
-    } else {
-        cerr << "Error al abrir el archivo para cargar la partida.\n";
-    }
-}
-
 int main() {
-    char tablero[6][7] = {0};
-    //NuevaPartida(tablero);
+    Conect4 juego;
 
-    string archivoPartida = "partida.csv";
-    string archivoPuntuacion = "puntuacion.csv";
+    while (true) {
+        std::cout << "Menú:\n";
+        std::cout << "1. Jugar contra la IA\n";
+        std::cout << "2. Cargar partida\n";
+        std::cout << "3. Salir\n";
+        std::cout << "Seleccione una opción: ";
 
-    int opcion;
-    do {
-        cout << "Menú Principal:\n";
-        cout << "1. Jugar una partida\n";
-        cout << "2. Ver puntuación jugador vs máquina\n";
-        cout << "3. Guardar partida\n";
-        cout << "4. Cargar partida\n";
-        cout << "5. Salir\n";
-        cout << "Seleccione una opción: ";
-        cin >> opcion;
+        int opcion;
+        std::cin >> opcion;
 
-        switch (opcion) {
-            case 1: {
-                char dificultad;
-                cout << "Seleccione la dificultad (Fácil: F, Medio: M, Difícil: D): ";
-                cin >> dificultad;
+        if (opcion == 1) {
+            // Jugar contra la IA
+            int dificultad;
+            std::cout << "Seleccione la dificultad (1: Fácil, 2: Medio, 3: Difícil): ";
+            std::cin >> dificultad;
 
-                int profundidadMaxima;
-                switch (dificultad) {
-                    case 'F':
-                    case 'f':
-                        //algo
-                        break;
-                    case 'M':
-                    case 'm':
-                        //algo
-                        break;
-                    case 'D':
-                    case 'd':
-                        //algo
-                        break;
-                    default:
-                        cout << "Dificultad no válida.\n";
-                        continue;
-                }
-
-                // Lógica del juego 
-                
-                break;
+            // Establecer la profundidad del árbol según la dificultad
+            if (dificultad == 1) {
+                juego.setProfundidad(2);
+            } else if (dificultad == 2) {
+                juego.setProfundidad(4);
+            } else if (dificultad == 3) {
+                juego.setProfundidad(6);
+            } else {
+                std::cout << "Opción no válida. Saliendo...\n";
+                return 0;
             }
-            case 2: {
-                // Ver puntuación jugador vs máquina 
-                break;
-            }
-            case 3: {
-                GuardarPartida(tablero, archivoPartida);
-                break;
-            }
-            case 4: {
-                CargarPartida(tablero, archivoPartida);
-                break;
-            }
-            case 5:
-                cout << "¡Hasta luego!\n";
-                break;
-            default:
-                cout << "Opción no válida. Inténtelo de nuevo.\n";
+
+            std::cout << "¿Quiere empezar primero? (1: Sí, 0: No): ";
+            int jugadorPrimero;
+            std::cin >> jugadorPrimero;
+
+            // Lógica para empezar el juego
+            // ...
+
+        } else if (opcion == 2) {
+            // Cargar partida
+            juego.cargarPartida();
+
+            // Preguntar quién quiere continuar (jugador o IA)
+            // ...
+
+            // Lógica para continuar el juego
+            // ...
+
+        } else if (opcion == 3) {
+            std::cout << "Hasta luego.\n";
+            return 0;
+        } else {
+            std::cout << "Opción no válida. Inténtelo de nuevo.\n";
         }
-
-    } while (opcion != 5);
+    }
 
     return 0;
 }
