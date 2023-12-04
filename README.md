@@ -1,13 +1,13 @@
 # Laboratorio-2-Estructuras-de-datos
 
-##Diseño del Juego
+## Diseño del Juego
 
 -Se utiliza una matriz bidimensional para representar el tablero del juego y se emplea la estructura Nodo para construir un árbol de posibles movimientos durante el uso del algoritmo minimax.
 
 -El código incluye funciones para imprimir el tablero, realizar movimientos de los jugadores, verificar victorias, y manejar la lógica de la IA con el algoritmo minimax.
 
 
-##Minimax y Decisiones de Diseño
+## Minimax y Decisiones de Diseño
 
 -La clase Minimax implementa el algoritmo minimax para que la IA elija la mejor jugada posible, evaluando las posiciones del tablero y buscando la mejor estrategia. Se implementa con diferentes niveles de dificultad (Fácil, Medio, Difícil).
 
@@ -16,7 +16,7 @@
 -Optimización de Código: El código incluye optimizaciones para evitar calcular nodos que no contribuyen a la decisión final, reduciendo así el costo computacional del algoritmo minimax.
 
 
-##Resultados de Pruebas
+## Resultados de Pruebas
 
 -Comparación de Dificultades: Se proporcionan tres niveles de dificultad (Fácil, Medio, Difícil) para la IA. La elección de la dificultad afecta la profundidad de búsqueda del algoritmo minimax, lo que se traduce en una mayor o menor capacidad estratégica.
 
