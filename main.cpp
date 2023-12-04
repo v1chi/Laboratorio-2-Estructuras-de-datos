@@ -142,11 +142,12 @@ void cargarPartida(char partida[6][7]) {
 
     if (archivo.is_open()) {
         for (int i = 0; i < 6; i++) {
+            string fila;
+            getline(archivo, fila);  // Leer toda la línea como una cadena
+
+            istringstream ss(fila);
             for (int j = 0; j < 7; j++) {
-                if (!(archivo >> partida[i][j])) {
-                    cout << "Error al leer el archivo de partida guardada.\n";
-                    return;
-                }
+                ss >> partida[i][j];
             }
         }
 
@@ -168,6 +169,15 @@ void guardarEnHistorial(char partida[6][7], int ganador) {
     }
 }
 
+void reiniciarTablero(char partida[6][7]) {
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            partida[i][j] = ' ';
+        }
+    }
+}
+
+
 int main() {
     Minimax minimax;  // Crear una instancia de la clase Minimax
 
@@ -182,16 +192,19 @@ int main() {
     int ganadasIA = 0, ganadasJugador = 0;
 
     while (true) {
+        cout << "---------------------------------------------" << endl;
         std::cout << "Menú:\n";
         std::cout << "1. Jugar contra la IA\n";
         std::cout << "2. Cargar partida\n";
         std::cout << "3. Ver historial de partidas\n";
         std::cout << "4. Ver puntuacion maquina vs jugador\n";
         std::cout << "5. Salir\n";
-        std::cout << "Seleccione una opción: ";
-
+        std::cout << "Seleccione una opción: "<< endl;
+        cout << "---------------------------------------------" << endl;
+        
         int opcion;
         std::cin >> opcion;
+        char jugador = 'X', ia = 'O';
 
         if (opcion == 1) {
             // Jugar contra la IA
@@ -202,8 +215,6 @@ int main() {
             std::cout << "¿Quiere empezar primero? (1: Si, 0: No): ";
             int jugadorPrimero;
             std::cin >> jugadorPrimero;
-
-            char jugador = 'X', ia = 'O';
             imprimirJuego(tablero);
 
             if (jugadorPrimero == 1) {
@@ -223,6 +234,7 @@ int main() {
                             std::cout << "¡Has ganado! Fin del juego.\n";
                             ganadasJugador++;
                             guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                            reiniciarTablero(tablero);
                             break;
                         }
                     } else {
@@ -243,6 +255,7 @@ int main() {
                         std::cout << "¡La IA ha ganado! Fin del juego.\n";
                         ganadasIA++;
                         guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                        reiniciarTablero(tablero);
                         break;
                     }
                     
@@ -251,6 +264,7 @@ int main() {
                     cin >> salirPartida;
                     if(salirPartida == 1){
                         guardarPartida(tablero);
+                        reiniciarTablero(tablero);
                         break;
                     }
                     else{
@@ -272,6 +286,7 @@ int main() {
                         std::cout << "¡La IA ha ganado! Fin del juego.\n";
                         ganadasIA++;
                         guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                        reiniciarTablero(tablero);
                         break;
                     }
 
@@ -290,10 +305,23 @@ int main() {
                             std::cout << "¡Has ganado! Fin del juego.\n";
                             ganadasJugador++;
                             guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                            reiniciarTablero(tablero);
                             break;
                         }
                     } else {
                         std::cout << "Columna no válida. Inténtelo de nuevo.\n";
+                        continue;
+                    }
+                    
+                    cout << "Desea salir? (1.Si 2.No)" << endl;
+                    int salirPartida;
+                    cin >> salirPartida;
+                    if(salirPartida == 1){
+                        guardarPartida(tablero);
+                        reiniciarTablero(tablero);
+                        break;
+                    }
+                    else{
                         continue;
                     }
                 }
@@ -301,8 +329,65 @@ int main() {
         } else if (opcion == 2) {
             cargarPartida(tablero);
             imprimirJuego(tablero);
-        } else if (opcion == 3) {
+            while(true){
+                int dificultad;
+                std::cout << "Seleccione la dificultad (1: Fácil, 2: Medio, 3: Difícil): ";
+                std::cin >> dificultad;
+                
+                int columnaJugador;
+                std::cout << "Turno del jugador. Ingrese el número de columna (1-7): ";
+                std::cin >> columnaJugador;
+    
+                // Realizar movimiento del jugador
+                if (columnaJugador >= 1 && columnaJugador <= 7 && tablero[0][columnaJugador-1] == ' ') {
+                    tirar(tablero, columnaJugador - 1, jugador);
+                    imprimirJuego(tablero);
+    
+                    // Verificar victoria del jugador
+                    if (victoria(tablero, jugador)) {
+                        std::cout << "¡Has ganado! Fin del juego.\n";
+                        ganadasJugador++;
+                        guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                        reiniciarTablero(tablero);
+                        break;
+                    }
+                } else {
+                    std::cout << "Columna no válida. Inténtelo de nuevo.\n";
+                    continue;
+                }
+    
+                // Turno de la IA
+                int columnaIA = minimax.ElegirMejorTirada(tablero, dificultad) + 1;
+                std::cout << "Turno de la IA. La IA elige la columna " << columnaIA << ".\n";
+    
+                // Realizar movimiento de la IA
+                tirar(tablero, columnaIA - 1, ia);
+                imprimirJuego(tablero);
+    
+                // Verificar victoria de la IA
+                if (victoria(tablero, ia)) {
+                    std::cout << "¡La IA ha ganado! Fin del juego.\n";
+                    ganadasIA++;
+                    guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                    reiniciarTablero(tablero);
+                    break;
+                }
+                        
+                cout << "Desea salir? (1.Si 2.No)" << endl;
+                int salirPartida;
+                cin >> salirPartida;
+                if(salirPartida == 1){
+                    guardarPartida(tablero);
+                    reiniciarTablero(tablero);
+                    break;
+                }
+                else{
+                    continue;
+                }
+            }
             
+        } else if (opcion == 3) {
+            cout << "No disponible por el momento" << endl;
         } else if (opcion == 4) {
              cout << "Ver puntuacion maquina vs jugador" << endl;
              cout << "Puntaje maquina: " << ganadasIA << endl;
@@ -314,6 +399,5 @@ int main() {
             std::cout << "Opción no válida. Inténtelo de nuevo.\n";
         }
     }
-
     return 0;
 }
