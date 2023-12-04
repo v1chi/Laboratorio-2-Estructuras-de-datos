@@ -24,10 +24,33 @@
 
 
 ## Minimax con PODA vs sin PODA
-La elección entre Minimax con o sin poda depende de las necesidades específicas del juego y del entorno de ejecución. Aquí hay algunas consideraciones generales:
 
--Para Juegos Sencillos o Tableros Pequeños: Minimax sin poda puede ser suficiente y es más fácil de implementar.
+Minimax sin Poda:
 
--Para Juegos Complejos o Tableros Grandes: Minimax con poda es preferible para mejorar la eficiencia y reducir los tiempos de respuesta.
+Ventajas:
 
--En casos intermedios, donde la complejidad computacional es un factor importante pero la eficiencia también es necesaria, es mejor implementar el PODA
+--Conceptualmente Sencillo: La implementación es más clara y sencilla sin la lógica de poda.
+
+--Garantía de Resultado Óptimo: Brinda la seguridad de encontrar la mejor jugada posible al explorar todo el espacio de búsqueda.
+
+Desventajas:
+
+--Ineficiencia Computacional: Puede ser costoso computacionalmente, especialmente en juegos complejos con un alto factor de ramificación y profundidad.
+
+--Lentitud en Decisiones: La falta de poda puede conducir a tiempos de respuesta lentos, impactando la experiencia del usuario.
+
+Minimax con Poda Alfa-Beta:
+
+Ventajas:
+
+--Eficiencia Mejorada: Reduce significativamente la cantidad de nodos explorados, mejorando el rendimiento computacional.
+
+--Tiempo de Respuesta Reducido: La poda Alfa-Beta permite tomar decisiones más rápidas, crucial para juegos complejos.
+
+Desventajas:
+
+--Complejidad Adicional: La implementación requiere manejar la lógica de poda, lo que puede aumentar la complejidad del código.
+
+--Soluciones Subóptimas en Casos Raros: En situaciones extremas, la poda podría pasar por alto la mejor jugada si se realiza demasiado pronto.
+
+Eficiencia del Algoritmo: La eficiencia del algoritmo es crítica en juegos estratégicos como Conecta 4. La poda Alfa-Beta destaca al reducir significativamente el número de nodos evaluados, lo que se traduce en una mejora notable en el tiempo de ejecución sin comprometer la calidad de las decisiones.
