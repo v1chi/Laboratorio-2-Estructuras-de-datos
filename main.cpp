@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include "Minimax.h"
 using namespace std;
 
@@ -107,19 +108,15 @@ double Heuristica(char partida[6][7]) {
     else return 0;
 }
 
-// Función para cargar la última partida desde un archivo CSV
-void cargarUltimaPartida(char partida[6][7]) {
-    ifstream archivo("ultima_partida.csv");
-
-    if (archivo.is_open()) {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
-                archivo >> partida[i][j];
-            }
+// Función para convertir el tablero en una cadena para almacenar en archivos CSV
+string convertirTableroAString(char partida[6][7]) {
+    stringstream ss;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            ss << partida[i][j] << " ";
         }
-
-        archivo.close();
     }
+    return ss.str();
 }
 
 // Función para guardar la partida actual en un archivo CSV
@@ -138,72 +135,38 @@ void guardarPartida(char partida[6][7]) {
     }
 }
 
-
-// Función para cargar el historial de partidas desde un archivo CSV
-void cargarHistorial(vector<string>& historial) {
-    ifstream archivo("historial_partidas.csv");
-
-    historial.clear();  // Limpiar el vector antes de cargar nuevas partidas
+// Función para cargar una partida desde un archivo CSV
+// Función para cargar una partida desde un archivo CSV
+void cargarPartida(char partida[6][7]) {
+    ifstream archivo("ultima_partida.csv");
 
     if (archivo.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            historial.push_back(linea);
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 7; j++) {
+                if (!(archivo >> partida[i][j])) {
+                    cout << "Error al leer el archivo de partida guardada.\n";
+                    return;
+                }
+            }
         }
 
         archivo.close();
-    }
-}
-
-// Función para actualizar las estadísticas de victorias en un archivo CSV
-void actualizarEstadisticas(char ganador) {
-    ifstream archivo("estadisticas.csv");
-    int victoriasIA, victoriasJugador;
-
-    if (archivo.is_open()) {
-        archivo >> victoriasIA >> victoriasJugador;
-        archivo.close();
-
-        if (ganador == 'O') {
-            victoriasIA++;
-        } else if (ganador == 'X') {
-            victoriasJugador++;
-        }
-
-        ofstream nuevoArchivo("estadisticas.csv");
-        nuevoArchivo << victoriasIA << " " << victoriasJugador;
-        nuevoArchivo.close();
-    }
-}
-
-void mostrarEstadisticasYHistorial() {
-    ifstream estadisticasArchivo("estadisticas.csv");
-    ifstream historialArchivo("historial_partidas.csv");
-
-    int victoriasIA, victoriasJugador;
-
-    if (estadisticasArchivo.is_open()) {
-        estadisticasArchivo >> victoriasIA >> victoriasJugador;
-        estadisticasArchivo.close();
-
-        cout << "Estadísticas:\n";
-        cout << "Victorias de la IA: " << victoriasIA << "\n";
-        cout << "Victorias del jugador: " << victoriasJugador << "\n";
-    }
-
-    vector<string> historial;
-    cargarHistorial(historial);
-
-    if (!historial.empty()) {
-        cout << "\nHistorial de Partidas:\n";
-        for (const string& partida : historial) {
-            cout << partida << "\n";
-        }
     } else {
-        cout << "\nNo hay partidas en el historial.\n";
+        cout << "No se pudo abrir el archivo de partida guardada.\n";
     }
 }
 
+// Función para guardar una partida en el historial de partidas
+void guardarEnHistorial(char partida[6][7], int ganador) {
+    ofstream archivoHistorial("historial_partidas.csv", ios::app);
+
+    if (archivoHistorial.is_open()) {
+        archivoHistorial << convertirTableroAString(partida) << "," << ganador << "\n";
+        archivoHistorial.close();
+    } else {
+        cout << "No se pudo abrir el archivo de historial de partidas.\n";
+    }
+}
 
 int main() {
     Minimax minimax;  // Crear una instancia de la clase Minimax
@@ -216,13 +179,15 @@ int main() {
         {' ', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', ' '}
     };
+    int ganadasIA = 0, ganadasJugador = 0;
 
     while (true) {
         std::cout << "Menú:\n";
         std::cout << "1. Jugar contra la IA\n";
         std::cout << "2. Cargar partida\n";
-        std::cout << "3. Ver historial y estadisticas\n";
-        std::cout << "4. Salir\n";
+        std::cout << "3. Ver historial de partidas\n";
+        std::cout << "4. Ver puntuacion maquina vs jugador\n";
+        std::cout << "5. Salir\n";
         std::cout << "Seleccione una opción: ";
 
         int opcion;
@@ -256,8 +221,8 @@ int main() {
                         // Verificar victoria del jugador
                         if (victoria(tablero, jugador)) {
                             std::cout << "¡Has ganado! Fin del juego.\n";
-                            actualizarEstadisticas('X');
-                            guardarPartida(tablero);
+                            ganadasJugador++;
+                            guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
                             break;
                         }
                     } else {
@@ -276,9 +241,20 @@ int main() {
                     // Verificar victoria de la IA
                     if (victoria(tablero, ia)) {
                         std::cout << "¡La IA ha ganado! Fin del juego.\n";
-                        actualizarEstadisticas('O');
+                        ganadasIA++;
+                        guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
+                        break;
+                    }
+                    
+                    cout << "Desea salir? (1.Si 2.No)" << endl;
+                    int salirPartida;
+                    cin >> salirPartida;
+                    if(salirPartida == 1){
                         guardarPartida(tablero);
                         break;
+                    }
+                    else{
+                        continue;
                     }
                 }
             } else if (jugadorPrimero == 0) {
@@ -294,8 +270,8 @@ int main() {
                     // Verificar victoria de la IA
                     if (victoria(tablero, ia)) {
                         std::cout << "¡La IA ha ganado! Fin del juego.\n";
-                        actualizarEstadisticas('O');
-                        guardarPartida(tablero);
+                        ganadasIA++;
+                        guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
                         break;
                     }
 
@@ -312,8 +288,8 @@ int main() {
                         // Verificar victoria del jugador
                         if (victoria(tablero, jugador)) {
                             std::cout << "¡Has ganado! Fin del juego.\n";
-                            actualizarEstadisticas('X');
-                            guardarPartida(tablero);
+                            ganadasJugador++;
+                            guardarEnHistorial(tablero, (victoria(tablero, 'O') ? 1 : (victoria(tablero, 'X') ? 2 : 0)));
                             break;
                         }
                     } else {
@@ -323,12 +299,15 @@ int main() {
                 }
             }
         } else if (opcion == 2) {
-            cargarUltimaPartida(tablero);
+            cargarPartida(tablero);
             imprimirJuego(tablero);
-            
         } else if (opcion == 3) {
-            mostrarEstadisticasYHistorial();
+            
         } else if (opcion == 4) {
+             cout << "Ver puntuacion maquina vs jugador" << endl;
+             cout << "Puntaje maquina: " << ganadasIA << endl;
+             cout << "Puntaje jugador: " << ganadasJugador << endl;
+        } else if (opcion == 5) {
             std::cout << "Hasta luego.\n";
             break;
         } else {
