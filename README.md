@@ -23,7 +23,7 @@
 -Guardado y Carga de Partidas: Los jugadores tienen la opción de guardar y cargar partidas. Esto proporciona flexibilidad y permite a los jugadores continuar partidas en otro momento.
 
 
-##Minimax con PODA vs sin PODA
+## Minimax con PODA vs sin PODA
 La elección entre Minimax con o sin poda depende de las necesidades específicas del juego y del entorno de ejecución. Aquí hay algunas consideraciones generales:
 
 -Para Juegos Sencillos o Tableros Pequeños: Minimax sin poda puede ser suficiente y es más fácil de implementar.
